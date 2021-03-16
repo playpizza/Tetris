@@ -19,14 +19,65 @@ public class Stage : MonoBehaviour
 
     private int halfWidth;
     private int halfHeight;
+    private float nextFallTime;
 
     private void Start()
     {
         halfWidth = Mathf.RoundToInt(boardWidth * 0.5f);
         halfHeight = Mathf.RoundToInt(boardHeight * 0.5f);
 
+        nextFallTime = Time.time + fallCycle;
+
         CreateBackground();
         CreateTetromino();
+    }
+
+    void Update()
+    {
+        Vector3 moveDir = Vector3.zero;
+        bool isRotate = false;
+
+        if(Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            moveDir.x = -1;
+        }
+        else if(Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            moveDir.x = 1;
+        }
+
+        if(Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            isRotate = true;
+        }
+        else if(Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            moveDir.y = -1;
+        }
+
+        //아래로 떨어지기
+        if(Time.time > nextFallTime)
+        {
+            nextFallTime = Time.time + fallCycle;
+            moveDir = Vector3.down;
+            isRotate = false;
+        }
+
+        if(moveDir != Vector3.zero || isRotate)
+        {
+            MoveTetromino(moveDir, isRotate);
+        }
+    }
+
+    bool MoveTetromino(Vector3 moveDir, bool isRotate)
+    {
+        tetrominoNode.transform.position += moveDir;
+        if(isRotate)
+        {
+            tetrominoNode.transform.rotation *= Quaternion.Euler(0, 0, 90);
+        }
+        
+        return true;
     }
 
     // 배경 타일 생성
